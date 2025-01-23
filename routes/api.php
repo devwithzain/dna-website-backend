@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ServiceController;
 
@@ -14,6 +15,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("/profile", [AuthController::class, "profile"]);
     Route::put('/profile/update', [AuthController::class, 'updateProfile']);
     Route::delete('/profile/delete', [AuthController::class, 'deleteAccount']);
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/cart', [CartController::class, 'store']);
+    Route::delete('/cart/{id}', [CartController::class, 'destroy']);
+    Route::delete('/cart', [CartController::class, 'deleteAll']);
 });
 
 Route::post("/login", [AuthController::class, "login"]);
