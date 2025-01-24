@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\FormController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\OrderController;
@@ -33,3 +34,6 @@ Route::put('/service/{id}', [ServiceController::class, 'update']);
 Route::delete('/service/{id}', [ServiceController::class, 'destroy']);
 
 Route::post('/checkout', [CheckoutController::class, 'createSession']);
+Route::get('/admin/orders', [OrderController::class, 'getAllOrders']);
+Route::post('/admin/order', [OrderController::class, 'placeOrder']);
+Route::post('/contactForm', [FormController::class, 'sendContactForm']);

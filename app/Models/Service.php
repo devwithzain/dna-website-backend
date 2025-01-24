@@ -14,10 +14,14 @@ class Service extends Model
    protected $fillable = ['title', 'description', 'price', 'shipping', 'image'];
    public function options()
    {
-      return $this->hasMany(ServiceOptions::class, 'services_id');
+      return $this->hasMany(ServiceOptions::class, 'service_id');
    }
    public function carts()
    {
       return $this->hasMany(Cart::class, 'service_id');
+   }
+   public function orderItems()
+   {
+      return $this->hasMany(OrderItem::class, 'service_id');
    }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Order;
+use App\Models\OrderItem;
 use Stripe\Stripe;
 use App\Models\Cart;
 use App\Models\Service;
@@ -16,17 +18,14 @@ class CheckoutController extends Controller
       $userId = $request->input('userId');
 
       $cartItems = Cart::where('user_id', $userId)->get();
-
       if ($cartItems->isEmpty()) {
          return response()->json(['message' => 'No items in the cart'], 404);
       }
 
       $serviceIds = $cartItems->pluck('service_id')->toArray();
-
       $services = Service::whereIn('id', $serviceIds)->get();
-
       if ($services->isEmpty()) {
-         return response()->json(['message' => 'No services found for the items in the cart'], 404);
+         return response()->json(['message' => 'No services found'], 404);
       }
 
       $lineItems = [];
@@ -46,7 +45,6 @@ class CheckoutController extends Controller
 
       try {
          Stripe::setApiKey(env('STRIPE_SECRET'));
-
          $session = CheckoutSession::create([
             'line_items' => $lineItems,
             'mode' => 'payment',
@@ -59,10 +57,28 @@ class CheckoutController extends Controller
             'cancel_url' => env('FRONTEND_WEBSITE_URL') . '/cart?canceled=1',
          ]);
 
+         // Save order after successful session creation
+         $order = Order::create([
+            'user_id' => $userId,
+            'status' => 'pending',
+         ]);
+
+         foreach ($cartItems as $item) {
+            OrderItem::create([
+               'order_id' => $order->id,
+               'service_id' => $item->service_id,
+               'quantity' => $item->quantity,
+            ]);
+         }
+
+         // Clear cart after order creation
+         Cart::where('user_id', $userId)->delete();
+
          return response()->json(['url' => $session->url]);
       } catch (\Exception $e) {
          return response()->json(['message' => $e->getMessage()], 500);
       }
    }
+
 
 }

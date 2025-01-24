@@ -2,59 +2,51 @@
 
 namespace App\Http\Controllers\Api;
 
-use Stripe\Stripe;
-use App\Models\Cart;
 use App\Models\Order;
-use App\Models\Service;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Stripe\Checkout\Session as CheckoutSession;
-
 
 class OrderController extends Controller
 {
-   public function createOrder(Request $request)
+   public function getAllOrders()
    {
-      $sessionId = $request->input('session_id'); // Get session ID passed from frontend
+      $orders = Order::with(['user', 'items.service'])->get();
 
-      // Verify the Stripe session
+      return response()->json($orders);
+   }
+   public function placeOrder(Request $request)
+   {
+      $request->validate([
+         'user_id' => 'required|exists:users,id',
+         'cart_items' => 'required|array|min:1',
+         'cart_items.*.service_id' => 'required|exists:services,id',
+         'cart_items.*.quantity' => 'required|integer|min:1',
+      ]);
+
       try {
-         Stripe::setApiKey(env('STRIPE_SECRET'));
+         $order = Order::create([
+            'user_id' => $request->user_id,
+            'status' => 'pending', // Default status
+         ]);
 
-         $session = CheckoutSession::retrieve($sessionId);
-
-         if ($session->payment_status != 'paid') {
-            return response()->json(['message' => 'Payment not successful'], 400);
-         }
-
-         // Create Order
-         $order = new Order();
-         $order->user_id = $session->metadata->userId; // From the metadata in the session
-         $order->total_amount = $session->amount_total / 100; // Convert cents to dollars
-         $order->status = 'pending'; // Or any initial status
-         $order->save();
-
-         // Create Order Items
-         $cartItems = Cart::where('user_id', $order->user_id)->get();
-         foreach ($cartItems as $cartItem) {
-            $service = Service::find($cartItem->service_id);
-
-            // Create order item for each product in the cart
+         foreach ($request->cart_items as $item) {
             OrderItem::create([
                'order_id' => $order->id,
-               'service_id' => $service->id,
-               'quantity' => $cartItem->quantity,
-               'price' => $service->price,
+               'service_id' => $item['service_id'],
+               'quantity' => $item['quantity'],
             ]);
          }
 
-         // Optionally, empty the cart after order creation
-         Cart::where('user_id', $order->user_id)->delete();
-
-         return response()->json(['message' => 'Order created successfully', 'order_id' => $order->id], 200);
+         return response()->json([
+            'message' => 'Order placed successfully.',
+            'order_id' => $order->id,
+         ], 201);
       } catch (\Exception $e) {
-         return response()->json(['message' => $e->getMessage()], 500);
+         return response()->json([
+            'message' => 'Failed to place the order.',
+            'error' => $e->getMessage(),
+         ], 500);
       }
    }
 }
