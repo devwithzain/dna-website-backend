@@ -4,7 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\CheckoutController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -29,3 +31,5 @@ Route::post('/service', [ServiceController::class, 'store']);
 Route::get('/service/{id}', [ServiceController::class, 'show']);
 Route::put('/service/{id}', [ServiceController::class, 'update']);
 Route::delete('/service/{id}', [ServiceController::class, 'destroy']);
+
+Route::post('/checkout', [CheckoutController::class, 'createSession']);

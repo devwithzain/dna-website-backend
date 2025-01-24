@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Cart extends Model
 {
-    protected $fillable = ['user_id', 'service_id'];
+    use HasFactory;
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    protected $table = 'carts';
+    protected $fillable = ['user_id', 'service_id'];
 
     public function services()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(Service::class, 'service_id');
     }
 }
