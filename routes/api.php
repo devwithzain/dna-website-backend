@@ -36,4 +36,4 @@ Route::delete('/service/{id}', [ServiceController::class, 'destroy']);
 Route::post('/checkout', [CheckoutController::class, 'createSession']);
 Route::get('/admin/orders', [OrderController::class, 'getAllOrders']);
 Route::post('/admin/order', [OrderController::class, 'placeOrder']);
-Route::post('/contactForm', [FormController::class, 'sendContactForm']);
+Route::post('/contact', [FormController::class, 'sendContactForm']);

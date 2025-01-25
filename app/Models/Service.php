@@ -14,7 +14,7 @@ class Service extends Model
    protected $fillable = ['title', 'description', 'price', 'shipping', 'image'];
    public function options()
    {
-      return $this->hasMany(ServiceOptions::class, 'service_id');
+      return $this->hasMany(ServiceOptions::class, 'services_id');
    }
    public function carts()
    {

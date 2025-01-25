@@ -15,21 +15,19 @@ class ContactFormMail extends Mailable
    public $name;
    public $email;
    public $phone;
-   public $postcode;
-   public $tvsize;
+   public $selectedOption;
+   public $selectedDate;
    public $specialRequest;
    public $subject;
-
-
-   public function __construct($subject, $userDetails, )
+   public function __construct($subject, $userDetails)
    {
       $this->name = $userDetails['name'];
       $this->email = $userDetails['email'];
-      $this->phone = $userDetails['phone'];
-      $this->postcode = $userDetails['postcode'];
-      $this->tvsize = $userDetails['tvsize'];
-      $this->specialRequest = $userDetails['specialRequest'];
+      $this->phone = $userDetails['phone'] ?? 'Not Provided';
+      $this->specialRequest = $userDetails['specialRequest'] ?? 'No Message';
       $this->subject = $subject;
+      $this->selectedOption = $userDetails['selectedOption'] ?? 'Not Selected';
+      $this->selectedDate = $userDetails['selectedDate'] ?? 'Not Provided';
    }
    public function envelope(): Envelope
    {
@@ -45,8 +43,8 @@ class ContactFormMail extends Mailable
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'postcode' => $this->postcode,
-            'tvsize' => $this->tvsize,
+            'selectedOption' => $this->selectedOption,
+            'selectedDate' => $this->selectedDate,
             'specialRequest' => $this->specialRequest,
          ],
       );

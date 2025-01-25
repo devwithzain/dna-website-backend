@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Order;
-use App\Models\OrderItem;
 use Stripe\Stripe;
 use App\Models\Cart;
+use App\Models\Order;
 use App\Models\Service;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Stripe\Checkout\Session as CheckoutSession;
@@ -53,7 +53,7 @@ class CheckoutController extends Controller
             'metadata' => [
                'userId' => $userId,
             ],
-            'success_url' => env('FRONTEND_WEBSITE_URL') . '/thankyou?session_id={CHECKOUT_SESSION_ID}&success=1',
+            'success_url' => env('FRONTEND_WEBSITE_URL') . '/?session_id={CHECKOUT_SESSION_ID}&success=1',
             'cancel_url' => env('FRONTEND_WEBSITE_URL') . '/cart?canceled=1',
          ]);
 
@@ -67,7 +67,7 @@ class CheckoutController extends Controller
             OrderItem::create([
                'order_id' => $order->id,
                'service_id' => $item->service_id,
-               'quantity' => $item->quantity,
+               'quantity' => $item->quantity ?? 1,
             ]);
          }
 
