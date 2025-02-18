@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\ServiceRequest;
 use App\Models\Service;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\CheckoutController;
+use App\Http\Controllers\Api\NewsletterController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -37,3 +38,5 @@ Route::post('/checkout', [CheckoutController::class, 'createSession']);
 Route::get('/admin/orders', [OrderController::class, 'getAllOrders']);
 Route::post('/admin/order', [OrderController::class, 'placeOrder']);
 Route::post('/contact', [FormController::class, 'sendContactForm']);
+
+Route::post('/subscribe', action: [NewsletterController::class, 'subscribe']);
