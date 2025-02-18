@@ -12,43 +12,30 @@ class ContactFormMail extends Mailable
 {
    use Queueable, SerializesModels;
 
-   public $name;
-   public $email;
-   public $phone;
-   public $selectedOption;
-   public $selectedDate;
-   public $specialRequest;
+   public $data;
    public $subject;
-   public function __construct($subject, $userDetails)
+
+   public function __construct($subject, $data)
    {
-      $this->name = $userDetails['name'];
-      $this->email = $userDetails['email'];
-      $this->phone = $userDetails['phone'] ?? 'Not Provided';
-      $this->specialRequest = $userDetails['specialRequest'] ?? 'No Message';
       $this->subject = $subject;
-      $this->selectedOption = $userDetails['selectedOption'] ?? 'Not Selected';
-      $this->selectedDate = $userDetails['selectedDate'] ?? 'Not Provided';
+      $this->data = $data;
    }
+
    public function envelope(): Envelope
    {
       return new Envelope(
          subject: $this->subject,
       );
    }
+
    public function content(): Content
    {
       return new Content(
          view: 'email.contact',
-         with: [
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'selectedOption' => $this->selectedOption,
-            'selectedDate' => $this->selectedDate,
-            'specialRequest' => $this->specialRequest,
-         ],
+         with: $this->data
       );
    }
+
    public function attachments(): array
    {
       return [];
