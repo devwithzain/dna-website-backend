@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Mail\ContactFormMail;
@@ -13,10 +12,11 @@ class FormController extends Controller
    public function sendContactForm(ContactFormRequest $request)
    {
       $data = $request->validated();
-      $subject = $data['name'] . " request a service!";
+      $subject = $data['name'] . " requested a service!";
 
       try {
-         Mail::to($data['email'])->send(new ContactFormMail($subject, $data));
+         // Send the email to the admin instead of the user
+         Mail::to(config('mail.from.address'))->send(new ContactFormMail($subject, $data));
       } catch (\Exception $e) {
          Log::error('Failed to send contact form email: ' . $e->getMessage());
          return response()->json(['error' => 'Failed to send email. Please try again later.'], 500);

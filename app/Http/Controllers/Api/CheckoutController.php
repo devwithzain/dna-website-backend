@@ -61,6 +61,7 @@ class CheckoutController extends Controller
          $order = Order::create([
             'user_id' => $userId,
             'status' => 'pending',
+            'phone_number' => $session->customer_details->phone ?? null,
          ]);
 
          foreach ($cartItems as $item) {
@@ -79,6 +80,4 @@ class CheckoutController extends Controller
          return response()->json(['message' => $e->getMessage()], 500);
       }
    }
-
-
 }
