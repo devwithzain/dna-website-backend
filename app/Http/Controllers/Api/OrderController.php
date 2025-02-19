@@ -12,7 +12,7 @@ class OrderController extends Controller
 {
    public function getAllOrders()
    {
-      $orders = Order::with(['user', 'items.service'])->get();
+      $orders = Order::with(['user', 'items.service', 'checkoutDetail'])->get();
 
       return response()->json($orders);
    }
@@ -24,7 +24,7 @@ class OrderController extends Controller
       }
 
       $orders = Order::where('user_id', $user->id)
-         ->with(['items.service', 'user'])
+         ->with(['items.service', 'user', 'checkoutDetail'])
          ->orderBy('created_at', 'desc')
          ->get();
 
@@ -42,7 +42,7 @@ class OrderController extends Controller
       try {
          $order = Order::create([
             'user_id' => $request->user_id,
-            'status' => 'pending', // Default status
+            'status' => 'pending',
          ]);
 
          foreach ($request->cart_items as $item) {

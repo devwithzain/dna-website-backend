@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api;
 use Stripe\Stripe;
 use App\Models\Cart;
 use App\Models\Service;
+use Stripe\PaymentIntent;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Stripe\Checkout\Session as CheckoutSession;
 
 class CheckoutController extends Controller
 {
@@ -23,8 +23,10 @@ class CheckoutController extends Controller
       $serviceIds = $cartItems->pluck('service_id')->toArray();
       $services = Service::whereIn('id', $serviceIds)->get();
 
+      $totalAmount = 0;
       $lineItems = [];
       foreach ($services as $service) {
+         $totalAmount += $service->price;
          $lineItems[] = [
             'quantity' => 1,
             'price_data' => [
@@ -40,19 +42,16 @@ class CheckoutController extends Controller
 
       try {
          Stripe::setApiKey(env('STRIPE_SECRET'));
-         $session = CheckoutSession::create([
-            'line_items' => $lineItems,
-            'mode' => 'payment',
-            'billing_address_collection' => 'required',
-            'phone_number_collection' => ['enabled' => true],
-            'metadata' => [
-               'userId' => $userId,
-            ],
-            'success_url' => env('FRONTEND_WEBSITE_URL') . '/?session_id={CHECKOUT_SESSION_ID}&success=1',
-            'cancel_url' => env('FRONTEND_WEBSITE_URL') . '/cart?canceled=1',
+         $paymentIntent = PaymentIntent::create([
+            'amount' => round($totalAmount * 100),
+            'currency' => 'USD',
+            'payment_method_types' => ['card'],
          ]);
 
-         return response()->json(['url' => $session->url]);
+         return response()->json([
+            'clientSecret' => $paymentIntent->client_secret,
+         ]);
+
       } catch (\Exception $e) {
          return response()->json(['message' => $e->getMessage()], 500);
       }

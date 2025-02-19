@@ -50,3 +50,22 @@ Route::post('/contact', [FormController::class, 'sendContactForm']);
 
 Route::post('/subscribe', action: [NewsletterController::class, 'subscribe']);
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
+
+
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
+
+
+Route::post('/payment-intent', function (Request $request) {
+    Stripe::setApiKey(env('STRIPE_SECRET'));
+
+    $paymentIntent = PaymentIntent::create([
+        'amount' => $request->amount, // Amount in cents
+        'currency' => $request->currency,
+        'payment_method_types' => ['card'],
+    ]);
+
+    return response()->json([
+        'clientSecret' => $paymentIntent->client_secret,
+    ]);
+});
