@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\ContactFormRequest;
+use Illuminate\Http\Request;
 use App\Mail\ContactFormMail;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Http\Request;
 
 class FormController extends Controller
 {
-   public function sendContactForm(ContactFormRequest $request)
+   public function sendContactForm(Request $request)
    {
       $data = $request->validate([
          'name' => 'required|string|max:255',

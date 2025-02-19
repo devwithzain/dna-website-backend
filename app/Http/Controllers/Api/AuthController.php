@@ -13,7 +13,8 @@ class AuthController extends Controller
 {
    public function login(LoginRequest $request)
    {
-      $user = User::where('email', $request->email)->first();
+      $email = strtolower($request->email);
+      $user = User::where('email', $email)->first();
       if (!$user || $request->email !== $user->email) {
          return response()->json(['error' => 'Email does not exist'], 401);
       }
@@ -39,8 +40,8 @@ class AuthController extends Controller
       }
 
       $user = User::create([
-         'name' => $request->name,
-         'email' => $request->email,
+         'name' => strtolower($request->name),
+         'email' => strtolower($request->email),
          'password' => Hash::make($request->password)
       ]);
 
